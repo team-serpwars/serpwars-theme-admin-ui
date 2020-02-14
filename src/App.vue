@@ -1,17 +1,41 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app" class="">
+      <b-container class="bv-example-row ">
+      <h1>Welcome to Serpwars Theme</h1>
+      <h5>v 1.0.0</h5>
+      <div class="spacer"></div>  
+
+        <b-row class="text-center">
+          <b-col cols="4">
+            <h4>Plugins</h4>
+            <plugin-states></plugin-states>
+          </b-col>
+          <b-col cols="4">
+            <h4>Templates</h4>
+          </b-col>
+          <b-col cols="4">
+            <h4>Options</h4>
+          </b-col>
+        </b-row>
+      </b-container>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 
+import Toastify from 'toastify-js'
+import { mapState, mapActions } from 'vuex'
+import PluginStates from './components/PluginStates.vue'
 export default {
   name: 'App',
   components: {
-    HelloWorld
+      PluginStates
+  },
+  methods:{
+     ...mapActions(['loadData']),
+  },
+  async created(){
+    await this.loadData();
   }
 }
 </script>
@@ -21,8 +45,9 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+}
+.spacer{
+  margin-top:50px;
 }
 </style>
