@@ -24,13 +24,13 @@ export const PluginPost = {
 					title:"Industry Pages"
 				},
 				{
-					id:3805,
+					id:385,
 					title:"Services Pages"
 				}
 			],
 			cptui:[
 				{slug:"services",title:"Services"},
-				{slug:"location",title:"Location"}
+				{slug:"locations",title:"Location"}
 			]
 		}
 	},
@@ -46,15 +46,15 @@ export const PluginPost = {
           		})			
 			})
 		},
-		// getCPTStatus:function({state}){
-		// 	state.pluginSettings.cptui.forEach(function(item,index){				
-		// 		axios.post(ajax_url, qs.stringify( {
-  //           		action:"serpwars_check_cpt_exists",
-  //           		slug:item.slug
-  //         		} ) ).then(response=>{              		
-  //             		// Vue.set(state.pluginSettings.acf[index],"found",response.data.success)
-  //         		})	
-		// 	})
-		// }
+		getCPTStatus:function({state}){
+			state.pluginSettings.cptui.forEach(function(item,index){				
+				axios.post(ajax_url, qs.stringify( {
+            		action:"serpwars_check_cpt_exists",
+            		slug:item.slug
+          		} ) ).then(response=>{              		
+              		Vue.set(state.pluginSettings.cptui[index],"found",response.data.success)
+          		})	
+			})
+		}
 	}
 }
