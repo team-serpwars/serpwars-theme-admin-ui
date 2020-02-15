@@ -10,6 +10,44 @@ export const PluginPost = {
 	namespaced: true,
 	state:{
 		pluginSettings:{
+			elementor_templates:[		
+				{
+					name: "4 Block Section",
+					id:0
+				},
+				{
+					name: "Why Choose Us?",
+					id:0
+				},
+				{
+					name: "What we do",
+					id:0
+				},
+				{
+					name: "8 Block Image Section",
+					id:0
+				},
+				{
+					name: "Gallery",
+					id:0
+				},
+				{
+					name: "Footer",
+					id:0
+				},
+				{
+					name: "Testimonial",
+					id:0
+				},
+				{
+					name: "2 Step Form",
+					id:0
+				},
+				{
+					name: "How it Works",
+					id:0
+				}							
+			],
 			acf:[
 				{
 					id:331,
@@ -31,7 +69,7 @@ export const PluginPost = {
 			cptui:[
 				{slug:"services",title:"Services"},
 				{slug:"locations",title:"Location"}
-			]
+			],			
 		}
 	},
 
@@ -44,6 +82,20 @@ export const PluginPost = {
           		} ) ).then(response=>{              		
               		Vue.set(state.pluginSettings.acf[index],"found",response.data.success)
           		})			
+			})
+		},
+		getElementorTemplatesStatus:function({state}){
+			state.pluginSettings.elementor_templates.forEach(function(item,index){	
+				if(item.id!=0){
+				axios.post(ajax_url, qs.stringify( {
+            		action:"serpwars_check_post_exists",
+            		id:item.id
+          		} ) ).then(response=>{              		
+              		Vue.set(state.pluginSettings.elementor_templates[index],"found",response.data.success)
+          		})			
+				}else{
+              		Vue.set(state.pluginSettings.elementor_templates[index],"found",false);
+				}
 			})
 		},
 		getCPTStatus:function({state}){

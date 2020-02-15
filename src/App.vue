@@ -10,14 +10,15 @@
             <h4>Plugins</h4>
             <plugin-states></plugin-states>
           </b-col>
-          <b-col cols="4">
-            <h4>Templates</h4>
+          <b-col cols="8">
+            <elementor-templates></elementor-templates>
           </b-col>
           <b-col cols="4">
-            <h4>Options</h4>
-            <advance-custom-field-entries></advance-custom-field-entries>
           </b-col>
         </b-row>
+        <div class="spacer"> </div>
+        <advance-custom-field-entries></advance-custom-field-entries>          
+        
       </b-container>
   </div>
 </template>
@@ -28,10 +29,11 @@ import Toastify from 'toastify-js'
 import { mapState, mapActions } from 'vuex'
 import PluginStates from './components/PluginStates.vue'
 import AdvanceCustomFieldEntries from './components/AdvanceCustomFieldEntries.vue'
+import ElementorTemplates from './components/ElementorTemplates.vue'
 export default {
   name: 'App',
   components: {
-      PluginStates,AdvanceCustomFieldEntries
+      PluginStates,AdvanceCustomFieldEntries,ElementorTemplates
   },
   methods:{
      ...mapActions(['loadData']),
