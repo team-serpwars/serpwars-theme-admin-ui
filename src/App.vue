@@ -15,6 +15,7 @@
           </b-col>
           <b-col cols="4">
             <h4>Options</h4>
+            <advance-custom-field-entries></advance-custom-field-entries>
           </b-col>
         </b-row>
       </b-container>
@@ -26,16 +27,18 @@
 import Toastify from 'toastify-js'
 import { mapState, mapActions } from 'vuex'
 import PluginStates from './components/PluginStates.vue'
+import AdvanceCustomFieldEntries from './components/AdvanceCustomFieldEntries.vue'
 export default {
   name: 'App',
   components: {
-      PluginStates
+      PluginStates,AdvanceCustomFieldEntries
   },
   methods:{
      ...mapActions(['loadData']),
   },
   async created(){
     await this.loadData();
+    console.log(this);
   }
 }
 </script>
