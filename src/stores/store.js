@@ -105,7 +105,8 @@ export const store = new Vuex.Store({
 })
 
 const _installPlugin= function() {
-	var plugins = store.state.pluginPicked
+	var plugins = store.state.pluginPicked.map(el =>{return el;})
+	console.log(plugins);
 	store.state.pluginPicked._currentItem = plugins[0]
 	console.log("installing "+store.state.pluginPicked._currentItem);
     if (store.state.pluginPicked._currentItem) {                
@@ -115,101 +116,114 @@ const _installPlugin= function() {
             slug: store.state.pluginPicked._currentItem,
             plugins: plugins
         };
-        console.log(store.state.pluginPicked._ajaxData)
-        
+
+
+        // console.log(qs.stringify(store.state.pluginPicked._ajaxData ));
+
         _globalAJAX(
             function(response) {
-                _pluginActions(response);
+            	// console.log(response)
+                _pluginActions(response.data);
             }
         );
+
+  //       axios.post(_ajaxUrl, qs.stringify( {
+  //           data:store.state.pluginPicked._ajaxData
+  //   	})).then(response=>{
+  //   		return response
+		// })
     }
 }
 
 const _globalAJAX= function(callback) {
-	console.log(_ajaxUrl)
-	axios.post(_ajaxUrl, qs.stringify( {
-            data:store.state.pluginPicked._ajaxData
-    })).then(response=>{
+
+	axios.post(_ajaxUrl, qs.stringify( 
+        store.state.pluginPicked._ajaxData
+    )).then(response=>{
     	return response
 	}).then(callback)
-    // $.ajax({
-    //     url: aux_setup_params.ajaxurl,
-    //     type: "post",
-    //     data: _ajaxData
-    // }).done(callback);
 }
 
 const _pluginActions = function(response) {
-	console.log(response);
 
-    // if (typeof response === "object" && response.success) {
-    //             // Update plugin status message
+    if (typeof response === "object" && response.success) {
+
+                // Update plugin status message
                 
-    //             // At this point, if the response contains the url, it means that we need to install/activate it.
-    //             if (typeof response.data.url !== "undefined") {
+                // At this point, if the response contains the url, it means that we need to install/activate it.
+                if (typeof response.data.url !== "undefined") {
 
-    //                 if (currentItemHash == response.data.hash) {
-    //                     console.log("Failed")
-    //                     currentItemHash = null;
-    //                     _installPlugin();
-    //                 } else {
-    //                     // we have an ajax url action to perform.
-    //                     _ajaxUrl = response.data.url;
-    //                     _ajaxData = response.data;
-    //                     currentItemHash = response.data.hash;
+                    if (currentItemHash == response.data.hash) {
+                        console.log("Failed")
+                        currentItemHash = null;
+                        _installPlugin();
+                    } else {
+                        // we have an ajax url action to perform.
+                        _ajaxUrl = response.data.url;
+                        _ajaxData = response.data;
+                        currentItemHash = response.data.hash;
 
-    //                     if(response.data.url){
-    //                     	$.ajax({
-    //         				    url: response.data.url,
-    //         				    type: "post",
-    //         				    data: _ajaxData
-    //         				}).done(function(html) {
-    //                             // Reset ajax url to default admin ajax value
-    //                             _ajaxUrl = aux_setup_params.ajaxurl;
-    //                             _installPlugin();
-    //                         });
+                        if(response.data.url){
 
-    //                     }else{
+                        axios.post(_ajaxUrl, qs.stringify( 
+        					store.state.pluginPicked._ajaxData
+    					)).then(response=>{
+    						return response
+						}).then(function(html){
+							_ajaxUrl = _ajaxUrl;
+                            _installPlugin();
+						})
+                //         	$.ajax({
+            				//     url: response.data.url,
+            				//     type: "post",
+            				//     data: _ajaxData
+            				// }).done(function(html) {
+                //                 // Reset ajax url to default admin ajax value
+                //                 _ajaxUrl = aux_setup_params.ajaxurl;
+                //                 _installPlugin();
+                //             });
 
-    //                     _globalAJAX(
-    //                         function(html) {
-    //                             // Reset ajax url to default admin ajax value
-    //                             _ajaxUrl = aux_setup_params.ajaxurl;
-    //                             _installPlugin();
-    //                         }
-    //                     );
-    //                     }
-    //                 }
-    //             } else {
-    //                 // otherwise it's just installed and we should make a notify to user
-    //                 // update isChecked
-    //                  pluginsList.forEach(function(e){ 
-    //                  	if(e.slug==_currentItem){
-    //                  		// e.isChecked = false;
-    //                  		e.isDone = true;
-    //                  		currentIndex+=1;
+                        }else{
 
-    //                  	}
-    //                  });
-    //                 console.log(_currentItem + " Is Already Installed")
-    //                 // Then jump to next plugin
-    //                 _processPlugins();
-    //             }
-    // } else {
-    //     // If there is an error, we will try to reinstall plugin twice with buffer checkup.
-    //     if (_attemptsBuffer > 1) {
-    //         // Reset buffer value
-    //         _attemptsBuffer = 0;
-    //         // error & try again with next plugin
-    //         console.log("AJAX Error")
-    //         _processPlugins();
-    //     } else {
-    //         // Try again & update buffer value
-    //         currentItemHash = null;
-    //         _attemptsBuffer++;
-    //         _installPlugin();
-    //     }
-    // }
+                        _globalAJAX(
+                            function(html) {
+                                // Reset ajax url to default admin ajax value
+                                _ajaxUrl = aux_setup_params.ajaxurl;
+                                _installPlugin();
+                            }
+                        );
+                        }
+                    }
+                } else {
+                    // otherwise it's just installed and we should make a notify to user
+                    // update isChecked
+                     pluginsList.forEach(function(e){ 
+                     	if(e.slug==_currentItem){
+                     		// e.isChecked = false;
+                     		e.isDone = true;
+                     		currentIndex+=1;
+
+                     	}
+                     });
+                    console.log(_currentItem + " Is Already Installed")
+                    // Then jump to next plugin
+                    _processPlugins();
+                }
+    } else {
+        // If there is an error, we will try to reinstall plugin twice with buffer checkup.
+        if (_attemptsBuffer > 1) {
+            // Reset buffer value
+            _attemptsBuffer = 0;
+            // error & try again with next plugin
+            console.log("AJAX Error")
+            _processPlugins();
+        } else {
+            // Try again & update buffer value
+            currentItemHash = null;
+            _attemptsBuffer++;
+            _installPlugin();
+        }
+    }
 }
 const _processPlugins = function() {
    var doNext = false,
