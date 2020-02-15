@@ -2,8 +2,10 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import qs  from 'qs';
-// import {WP_Plugins} from './modules/wp-plugins.store.js'
+import {WP_Plugin_Service} from './modules/wp-plugins.service.js'
 import {PluginPost} from './modules/plugin-post.module.js'
+import "toastify-js/src/toastify.css"
+import Toastify from 'toastify-js'
 
 Vue.use(Vuex);
 
@@ -15,7 +17,7 @@ let aux_setup_params = aux_setup_params  ||  {
 var  _ajaxData = {};
 var currentItemHash,_attemptsBuffer,_attemptsBuffer;
 var currentIndex=0;
-
+var _currentItem = null;
 
 let _ajaxUrl = ajax_url;
 
@@ -63,12 +65,17 @@ export const store = new Vuex.Store({
             var picked = [];
             for(var i in state.loadedData.plugins){
             	if(state.loadedData.plugins[i].isChecked){
-            		state.pluginPicked.push(state.loadedData.plugins[i].slug)
+            		state.pluginPicked.push(state.loadedData.plugins[i])
             	}
             }
+			console.log(state.pluginPicked)
 		},
 		setPluginPicked(state,data){
 			state.pluginPicked = data;
+		},
+		setPluginStatus(state,status){
+			const slug = state.installerData._currentItem.slug;
+			state.loadedData.plugins[slug].status = status
 		}
 	},
 	actions:{
@@ -91,171 +98,220 @@ export const store = new Vuex.Store({
               state.commit('setData',response.data.data)
           })
 		},
-		install({state}){
-			// console.log(state.pluginPicked);
-			_installPlugin();
+		install({state}){		
+			// _installPlugin();
+			this.dispatch("_installPlugins");
 		},
-		_installPlugin({state}){
-			console.log("Install and activate all plugins")
-			// var plugins = pluginsList.map(function(e){ if (e.ischecked) return e.slug });
+		_installPlugins({state}){
 
+			// var plugins = state.pluginPicked.map(el =>{return el;})
+			state.installerData._currentItem = state.pluginPicked[state.installerData.currentIndex];
+
+		
+			Toastify({
+				text: "Installing "+state.installerData._currentItem.name,
+				duration: 3000,
+				close: true,
+				gravity: "top", // `top` or `bottom`
+				position: 'right', // `left`, `center` or `right`
+				backgroundColor: "linear-gradient(to right, #47a3da, #4284f4)",
+				stopOnFocus: true // Prevents dismissing of toast on hover
+		    }).showToast();
+		
+			if (state.installerData._currentItem.name) {
+				state.installerData_ajaxData = {
+		            action: "serpwars_setup_plugins",
+		            wpnonce: aux_setup_params.wpnonce,
+		            slug: state.installerData._currentItem.slug,
+		            plugins: state.pluginPicked.map(el=>{return el.slug})
+		        };
+
+		        var context = this;
+				this.commit('setPluginStatus',"Installing");
+				this.dispatch("_globalAJAX", 		function(response) {
+					    context.dispatch('_pluginActions',response.data)
+					    // console.log(response.data);
+					    // _pluginActions(response.data);
+				});
+
+		 //        _globalAJAX(
+			// 		function(response) {
+			// 		    _pluginActions(response.data);
+			// 		}
+		 //        );
+			}
+		},
+		_globalAJAX({state},callback){
+			axios.post(_ajaxUrl, qs.stringify(state.installerData_ajaxData)).then(response=>{
+    			return response
+			}).then(callback)
+		},
+		_pluginActions({state},response){
+            if (typeof response === "object" && response.success) {
+            	console.log(this);
+            //     // Update plugin status message
+                
+            //     // At this point, if the response contains the url, it means that we need to install/activate it.
+                if (typeof response.data.url !== "undefined") {
+
+                    if (currentItemHash == response.data.hash) {
+    						Toastify({
+								text: "Failed Install  "+state.installerData._currentItem.slug,
+								duration: 3000,
+								close: true,
+								gravity: "top", // `top` or `bottom`
+								position: 'right', // `left`, `center` or `right`
+								backgroundColor: "linear-gradient(to right, #ff0000, #ff0000)",
+								stopOnFocus: true // Prevents dismissing of toast on hover
+    						}).showToast();      
+    				        // state.installerData.currentItemHash = null;
+    				      	this.dispatch("_installPlugins");
+                    } else {
+            //             // we have an ajax url action to perform.
+                       	var context = this;
+                        _ajaxUrl = response.data.url;
+                        state.installerData_ajaxData = response.data;
+                        state.installerData.currentItemHash = response.data.hash;
+
+                        if(response.data.url){
+                        	console.log(_ajaxUrl,state.installerData_ajaxData)
+
+                        	axios.post(response.data.url,
+                        	 qs.stringify(state.installerData_ajaxData))
+                        	.then(response=>{
+    							return response
+							}).then(function(html){
+								_ajaxUrl = ajax_url;
+                            	context.dispatch("_installPlugins");
+							})
+
+
+                        }else{
+                        	this.dispatch("_globalAJAX", 		function(response) {
+                        		_ajaxUrl = ajax_url;
+                            	context.dispatch("_installPlugins");
+							});
+                        }
+                    }
+                } else {
+            //         // otherwise it's just installed and we should make a notify to user
+            //         // update isChecked
+            //          pluginsList.forEach(function(e){ 
+            //          	if(e.slug==_currentItem){
+            //          		// e.isChecked = false;
+            //          		e.isDone = true;
+            //          		currentIndex+=1;
+
+            //          	}
+            //          });
+            //         console.log(_currentItem + " Is Already Installed")
+            //         // Then jump to next plugin
+            //         _processPlugins();
+                }
+            } else {
+            	// console.log("This one");
+            //     // If there is an error, we will try to reinstall plugin twice with buffer checkup.
+            //     if (_attemptsBuffer > 1) {
+            //         // Reset buffer value
+            //         _attemptsBuffer = 0;
+            //         // error & try again with next plugin
+            //         console.log("AJAX Error")
+            //         _processPlugins();
+            //     } else {
+            //         // Try again & update buffer value
+            //         currentItemHash = null;
+            //         _attemptsBuffer++;
+            //         _installPlugin();
+            //     }
+            }
 		}
+
 	}
 
 })
 
-const _installPlugin= function() {
-	var plugins = store.state.pluginPicked.map(el =>{return el;})
-	console.log(plugins);
-	store.state.pluginPicked._currentItem = plugins[0]
-	console.log("installing "+store.state.pluginPicked._currentItem);
-    if (store.state.pluginPicked._currentItem) {                
-        store.state.pluginPicked._ajaxData = {
-            action: "serpwars_setup_plugins",
-            wpnonce: aux_setup_params.wpnonce,
-            slug: store.state.pluginPicked._currentItem,
-            plugins: plugins
-        };
 
 
-        // console.log(qs.stringify(store.state.pluginPicked._ajaxData ));
-
-        _globalAJAX(
-            function(response) {
-            	// console.log(response)
-                _pluginActions(response.data);
-            }
-        );
-
-  //       axios.post(_ajaxUrl, qs.stringify( {
-  //           data:store.state.pluginPicked._ajaxData
-  //   	})).then(response=>{
-  //   		return response
-		// })
-    }
-}
-
-const _globalAJAX= function(callback) {
-
-	axios.post(_ajaxUrl, qs.stringify( 
-        store.state.pluginPicked._ajaxData
-    )).then(response=>{
-    	return response
-	}).then(callback)
-}
 
 const _pluginActions = function(response) {
+	console.log(response)
 
-    if (typeof response === "object" && response.success) {
-
-                // Update plugin status message
+            if (typeof response === "object" && response.success) {
+            	console.log(this);
+            //     // Update plugin status message
                 
-                // At this point, if the response contains the url, it means that we need to install/activate it.
+            //     // At this point, if the response contains the url, it means that we need to install/activate it.
                 if (typeof response.data.url !== "undefined") {
 
                     if (currentItemHash == response.data.hash) {
-                        console.log("Failed")
-                        currentItemHash = null;
+    				Toastify({
+						text: "Failed Install  "+_currentItem,
+						duration: 3000,
+						close: true,
+						gravity: "top", // `top` or `bottom`
+						position: 'right', // `left`, `center` or `right`
+						backgroundColor: "linear-gradient(to right, #ff0000, #ff0000)",
+						stopOnFocus: true // Prevents dismissing of toast on hover
+    				}).showToast();            //             currentItemHash = null;
                         _installPlugin();
                     } else {
-                        // we have an ajax url action to perform.
+            //             // we have an ajax url action to perform.
                         _ajaxUrl = response.data.url;
                         _ajaxData = response.data;
                         currentItemHash = response.data.hash;
 
                         if(response.data.url){
+                        	console.log(_ajaxUrl,_ajaxData)
 
-                        axios.post(_ajaxUrl, qs.stringify( 
-        					store.state.pluginPicked._ajaxData
-    					)).then(response=>{
-    						return response
-						}).then(function(html){
-							_ajaxUrl = _ajaxUrl;
-                            _installPlugin();
-						})
-                //         	$.ajax({
-            				//     url: response.data.url,
-            				//     type: "post",
-            				//     data: _ajaxData
-            				// }).done(function(html) {
-                //                 // Reset ajax url to default admin ajax value
-                //                 _ajaxUrl = aux_setup_params.ajaxurl;
-                //                 _installPlugin();
-                //             });
+                        	axios.post(response.data.url,
+                        	 qs.stringify(_ajaxData))
+                        	.then(response=>{
+    							return response
+							}).then(function(html){
+								_ajaxUrl = ajax_url;
+                            	_installPlugin();
+							})
+
 
                         }else{
-
-                        _globalAJAX(
-                            function(html) {
-                                // Reset ajax url to default admin ajax value
-                                _ajaxUrl = aux_setup_params.ajaxurl;
-                                _installPlugin();
-                            }
-                        );
+                        	_globalAJAX(
+                            	function(html) {
+                                	// Reset ajax url to default admin ajax value
+                                	_ajaxUrl = aux_setup_params.ajaxurl;
+                                	_installPlugin();
+                            	}
+                        	);
                         }
                     }
                 } else {
-                    // otherwise it's just installed and we should make a notify to user
-                    // update isChecked
-                     pluginsList.forEach(function(e){ 
-                     	if(e.slug==_currentItem){
-                     		// e.isChecked = false;
-                     		e.isDone = true;
-                     		currentIndex+=1;
+            //         // otherwise it's just installed and we should make a notify to user
+            //         // update isChecked
+            //          pluginsList.forEach(function(e){ 
+            //          	if(e.slug==_currentItem){
+            //          		// e.isChecked = false;
+            //          		e.isDone = true;
+            //          		currentIndex+=1;
 
-                     	}
-                     });
-                    console.log(_currentItem + " Is Already Installed")
-                    // Then jump to next plugin
-                    _processPlugins();
+            //          	}
+            //          });
+            //         console.log(_currentItem + " Is Already Installed")
+            //         // Then jump to next plugin
+            //         _processPlugins();
                 }
-    } else {
-        // If there is an error, we will try to reinstall plugin twice with buffer checkup.
-        if (_attemptsBuffer > 1) {
-            // Reset buffer value
-            _attemptsBuffer = 0;
-            // error & try again with next plugin
-            console.log("AJAX Error")
-            _processPlugins();
-        } else {
-            // Try again & update buffer value
-            currentItemHash = null;
-            _attemptsBuffer++;
-            _installPlugin();
+            } else {
+            	// console.log("This one");
+            //     // If there is an error, we will try to reinstall plugin twice with buffer checkup.
+            //     if (_attemptsBuffer > 1) {
+            //         // Reset buffer value
+            //         _attemptsBuffer = 0;
+            //         // error & try again with next plugin
+            //         console.log("AJAX Error")
+            //         _processPlugins();
+            //     } else {
+            //         // Try again & update buffer value
+            //         currentItemHash = null;
+            //         _attemptsBuffer++;
+            //         _installPlugin();
+            //     }
+            }
         }
-    }
-}
-const _processPlugins = function() {
-   var doNext = false,
-       $pluginsList =  pluginsList.map(function(e){ if(e.ischecked) return  e;});
-
-       console.log(_currentItem);
-
-   var done_counter = 0;
-   // Scroll on each progress in modal view
-   
-
-   pluginsList.forEach(function(item) {
-       if (_currentItem == null || doNext) {
-           if (item.isChecked) {
-           	item.inProgress = true
-               _currentItem = item.slug;
-               _installPlugin();
-               doNext = false;
-           }
-       } else if (item.slug === _currentItem) {
-           item.inProgress = false;
-           doNext = true;
-
-       }
-   });
-   pluginsList.forEach(function(item) {
-       if (item.isChecked && item.isDone) {
-       	done_counter+=1
-       }
-   });
-
-   if(done_counter == $pluginsList.length){
-   	console.log("All Items were installed")
-   }          
-}

@@ -5,9 +5,15 @@
     		<label for="">
     			<input type="checkbox" v-model="pluginPicked" :value="plugin.slug">
     		{{plugin.name}}</label>
+    			<span v-if="plugin.status!=''">
+    				<b-badge variant="info" pill >{{plugin.status}}</b-badge>
+    			</span>
+    			<span v-else>
+    				
     			<b-badge variant="success" pill v-if="plugin.isActive && plugin.isInstalled">Activated</b-badge>
     			<b-badge variant="primary" pill v-if="!plugin.isActive && plugin.isInstalled">Installed</b-badge>
     			<b-badge variant="danger" pill v-if="!plugin.isActive && !plugin.isInstalled">Not Installed</b-badge>
+    			</span>
     	</b-list-group-item>
 	</b-list-group>
 </template>
@@ -27,7 +33,7 @@
       			},
       			set (value) {
         			this.$store.commit('setPluginPicked', value);
-        			console.log(this.$store.state.pluginPicked);
+        			// console.log(this.$store.state.pluginPicked);
       			}
     		},
 		}
