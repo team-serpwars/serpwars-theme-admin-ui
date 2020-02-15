@@ -13,6 +13,9 @@ Vue.use(IconsPlugin)
 
 Vue.config.productionTip = false
 
+
+var test_variable="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptate, neque. Vel, asperiores. Animi officiis quae cumque quas saepe, quod, culpa, eligendi nihil libero ratione perspiciatis est. Repudiandae tempora, deserunt debitis.";
+
 new Vue({
 	store,
   render: h => h(App),

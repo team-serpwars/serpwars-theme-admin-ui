@@ -9,6 +9,8 @@
           <b-col cols="4">
             <h4>Plugins</h4>
             <plugin-states></plugin-states>
+            <br>
+            <button class="btn btn-success btn-block" @click="install">Install Plugins</button>
           </b-col>
           <b-col cols="8">
             <elementor-templates></elementor-templates>
@@ -36,11 +38,11 @@ export default {
       PluginStates,AdvanceCustomFieldEntries,ElementorTemplates
   },
   methods:{
-     ...mapActions(['loadData']),
+     ...mapActions(['loadData','install']),
   },
   async created(){
     await this.loadData();
-    console.log(this);
+    
   }
 }
 </script>
