@@ -3,7 +3,7 @@
 		<b-list-group-item class="d-flex justify-content-between align-items-center" v-for="plugin  in $store.state.loadedData.plugins">
 				
     		<label for="">
-    			<input type="checkbox" v-model="pluginPicked" :value="plugin.slug">
+    			<input type="checkbox" v-model="pluginPicked" :value="plugin">
     		{{plugin.name}}</label>
     			<span v-if="plugin.status!=''">
     				<b-badge variant="info" pill >{{plugin.status}}</b-badge>
