@@ -76,10 +76,15 @@ export const PluginPost = {
 		install({state,dispatch}){
 			// console.log(state.pluginSettings.cptui);
 			axios.post(ajax_url, qs.stringify( {
-            		action:"serpwars_import_options"
+            		action:"serpwars_import_acf_options"
           	} ) ).then(response=>{              		
 				state.pluginSettings.acf = response.data.data.acf;         	
-				state.pluginSettings.cptui = response.data.data.cptui;         	
+				state.pluginSettings.cptui = response.data.data.cptui;   				
+				dispatch('getCPTStatus');      	
+
+				if(!response.data.data.acf[0].id){
+					dispatch('install');
+				}
      			// dispatch('getElementorTemplatesStatus');
 			})	
 		},
