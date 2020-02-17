@@ -22,6 +22,7 @@
     		</b-list-group-item>
 			</b-list-group>
 		</b-col>
+		 <button class="btn btn-success btn-block" @click="install">Install Options</button>
 	</b-row>
 </template>
 <script>
@@ -29,11 +30,12 @@
 	export default{
 		name:'AdvanceCustomFieldEntries',
 		methods:{
-     		...mapActions('PluginPost',['getItems','getCPTStatus']),
+     		...mapActions('PluginPost',['loadOptions','getItems','getCPTStatus','install']),
   		},
   		async created(){
-  			await this.getItems();
-  			await this.getCPTStatus();
+  			await this.loadOptions();
+  			// await this.getItems();
+  			// await this.getCPTStatus();
   		}
 	}
 </script>

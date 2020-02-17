@@ -74,6 +74,17 @@ export const PluginPost = {
 	},
 
 	actions:{
+		loadOptions({state,dispatch}){
+			var context = this;
+			axios.post(ajax_url, qs.stringify( {
+            		action:"serpwars_load_options"
+          	} ) ).then(response=>{           
+				state.pluginSettings = response.data.data; 
+				console.log(response.data.data);
+				dispatch('getItems');
+				dispatch('getCPTStatus');
+			})	
+		},
 		getItems:function({state}){
 			state.pluginSettings.acf.forEach(function(item,index){				
 				axios.post(ajax_url, qs.stringify( {
@@ -107,6 +118,15 @@ export const PluginPost = {
               		Vue.set(state.pluginSettings.cptui[index],"found",response.data.success)
           		})	
 			})
+		},
+		install({state}){
+			// console.log(state.pluginSettings.cptui);
+			axios.post(ajax_url, qs.stringify( {
+            		action:"serpwars_import_options"
+          	} ) ).then(response=>{              		
+				state.pluginSettings = response.data.data;          	
+     	
+			})	
 		}
 	}
 }
