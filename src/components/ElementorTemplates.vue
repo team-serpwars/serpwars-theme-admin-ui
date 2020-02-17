@@ -1,6 +1,5 @@
 <template>
 	<div>	
-	<h4>Templates</h4>
 	<b-list-group>
 		<b-list-group-item class="d-flex justify-content-between align-items-center" v-for="entry  in $store.state.PluginPost.pluginSettings.elementor_templates">
 

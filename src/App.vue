@@ -5,7 +5,22 @@
       <h5>v 1.0.0</h5>
       <div class="spacer"></div>  
 
-        <b-row class="text-center">
+      <button class="btn btn-default btn-lg border border-secondary mb-2 plugins">Plugins</button>
+      <button class="btn btn-default btn-lg border border-secondary mb-2 ml-2 mr-2 templates">Templates</button>
+      <button class="btn btn-default btn-lg border border-secondary mb-2 options">Options</button>
+<div class="siema">
+  <div> 
+    <plugin-states></plugin-states>
+    <button class="btn btn-success btn-block" @click="install">Install Plugins</button>
+  </div>
+  <div>
+    <elementor-templates></elementor-templates>
+  </div>
+  <div>
+    <advance-custom-field-entries></advance-custom-field-entries>  
+  </div>
+</div>
+        <!-- <b-row class="text-center">
           <b-col cols="4">
             <h4>Plugins</h4>
             <plugin-states></plugin-states>
@@ -19,7 +34,7 @@
           </b-col>
         </b-row>
         <div class="spacer"> </div>
-        <advance-custom-field-entries></advance-custom-field-entries>          
+        <advance-custom-field-entries></advance-custom-field-entries>   -->        
         
       </b-container>
   </div>
@@ -32,8 +47,15 @@ import { mapState, mapActions } from 'vuex'
 import PluginStates from './components/PluginStates.vue'
 import AdvanceCustomFieldEntries from './components/AdvanceCustomFieldEntries.vue'
 import ElementorTemplates from './components/ElementorTemplates.vue'
+import Siema from 'siema';
+
 export default {
-  name: 'App',
+  name: 'App',  
+  data(){
+      return {
+        mySiema:{}
+      }
+    },
   components: {
       PluginStates,AdvanceCustomFieldEntries,ElementorTemplates
   },
@@ -42,7 +64,15 @@ export default {
   },
   async created(){
     await this.loadData();
-    
+    this.mySiema = new Siema()
+
+    const btn0 = document.querySelector('.plugins');
+    const btn1 = document.querySelector('.templates');
+    const btn2 = document.querySelector('.options');
+
+    btn0.addEventListener('click', () => this.mySiema.goTo(0));
+    btn1.addEventListener('click', () => this.mySiema.goTo(1));
+    btn2.addEventListener('click', () => this.mySiema.goTo(2));
   }
 }
 </script>
