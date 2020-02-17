@@ -8,7 +8,9 @@ import "toastify-js/src/toastify.css"
 import Toastify from 'toastify-js'
 
 Vue.use(Vuex);
-
+var aux_setup_params = aux_setup_params || {
+	ajaxurl:"http://localhost/custom-site/wp-admin/admin-ajax.php"
+}
 let ajax_url = aux_setup_params.ajaxurl  ||  "http://localhost/custom-site/wp-admin/admin-ajax.php";
 
 

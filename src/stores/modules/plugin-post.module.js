@@ -2,75 +2,25 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import qs  from 'qs';
+var aux_setup_params = aux_setup_params || {
+	ajaxurl:"http://localhost/custom-site/wp-admin/admin-ajax.php"
+}
 let ajax_url = aux_setup_params.ajaxurl  ||  "http://localhost/custom-site/wp-admin/admin-ajax.php";
-console.log(aux_setup_params);
+console.log(ajax_url);
 
 Vue.use(Vuex);
 
 export const PluginPost = {
 	namespaced: true,
 	state:{
+		template_imports:{
+			currentIndex:-1,
+			queue:[]
+		},
 		pluginSettings:{
-			elementor_templates:[		
-				{
-					name: "4 Block Section",
-					id:0
-				},
-				{
-					name: "Why Choose Us?",
-					id:0
-				},
-				{
-					name: "What we do",
-					id:0
-				},
-				{
-					name: "8 Block Image Section",
-					id:0
-				},
-				{
-					name: "Gallery",
-					id:0
-				},
-				{
-					name: "Footer",
-					id:0
-				},
-				{
-					name: "Testimonial",
-					id:0
-				},
-				{
-					name: "2 Step Form",
-					id:0
-				},
-				{
-					name: "How it Works",
-					id:0
-				}							
-			],
-			acf:[
-				{
-					id:331,
-					title:"General Pages"
-				},
-				{
-					id:337,
-					title:"Icon Field"
-				},
-				{
-					id:339,
-					title:"Industry Pages"
-				},
-				{
-					id:385,
-					title:"Services Pages"
-				}
-			],
-			cptui:[
-				{slug:"services",title:"Services"},
-				{slug:"locations",title:"Location"}
-			],			
+			elementor_templates:[],
+			acf:[],
+			cptui:[],			
 		}
 	},
 
@@ -99,11 +49,13 @@ export const PluginPost = {
 		},
 		getElementorTemplatesStatus:function({state}){
 			state.pluginSettings.elementor_templates.forEach(function(item,index){	
+     		
+
 				if(item.id!=0){
 				axios.post(ajax_url, qs.stringify( {
             		action:"serpwars_check_post_exists",
             		id:item.id
-          		} ) ).then(response=>{              		
+          		} ) ).then(response=>{  
               		Vue.set(state.pluginSettings.elementor_templates[index],"found",response.data.success)
           		})			
 				}else{
@@ -121,34 +73,50 @@ export const PluginPost = {
           		})	
 			})
 		},
-		install({state}){
+		install({state,dispatch}){
 			// console.log(state.pluginSettings.cptui);
 			axios.post(ajax_url, qs.stringify( {
             		action:"serpwars_import_options"
           	} ) ).then(response=>{              		
-				state.pluginSettings = response.data.data;         	
-     	
+				state.pluginSettings.acf = response.data.data.acf;         	
+				state.pluginSettings.cptui = response.data.data.cptui;         	
+     			// dispatch('getElementorTemplatesStatus');
 			})	
 		},
 		importTemplates({state,dispatch}){
 			axios.post(ajax_url, qs.stringify( {
             		action:"serpwars_import_templates"
           	} ) ).then(response=>{              		
-				var templates = response.data.data;
-				templates.forEach(template=>{
-					dispatch('importTemplate',template)
-				})     	
+				state.template_imports.queue = response.data.data;
+				state.template_imports.currentIndex = 0;
+				dispatch('importTemplate')
+
 			})	
 		},
-		importTemplate({state},template){
-			var url = template.template
-			axios.post(ajax_url, qs.stringify( {
+		importTemplate({state,dispatch}){
+			if(state.template_imports.currentIndex < state.template_imports.queue.length ){
+				var template = state.template_imports.queue[state.template_imports.currentIndex]
+				console.log(template);
+				var url = template.template ;
+				axios.post(ajax_url, qs.stringify( {
             		action:"serpwars_import_elementor_templates",
             		url:url,
-            		name:template.name
-          	} ) ).then(response=>{              		
-				console.log(response)
-			})
+            		name:template.name,
+            		index:state.template_imports.currentIndex
+          		} ) ).then(response=>{        
+          			state.pluginSettings.elementor_templates[state.template_imports.currentIndex].found=true;
+          			state.template_imports.currentIndex +=1;  		
+					console.log(response)
+
+					setTimeout(function(){
+						dispatch('importTemplate');
+					},5000)
+				})
+			}else{
+				console.log("All Templates Imported");
+			}
+
+			
 		}
 	}
 }
