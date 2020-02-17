@@ -10,7 +10,7 @@
     			<b-badge variant="danger" pill v-else="entry.found" >Not Installed</b-badge>
     	</b-list-group-item>
 	</b-list-group>
-
+  <button class="btn btn-success btn-block" @click="importTemplates">Import Templates</button>
 	</div>
 </template>
 <script>
@@ -18,7 +18,7 @@
 	export default{
 		name:'ElementorTemplates',
 		methods:{
-     		...mapActions('PluginPost',['getElementorTemplatesStatus']),
+     		...mapActions('PluginPost',['getElementorTemplatesStatus','importTemplates']),
   		},
   		async created(){
   			await this.getElementorTemplatesStatus();

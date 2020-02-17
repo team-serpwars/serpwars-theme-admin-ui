@@ -2,7 +2,8 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import qs  from 'qs';
-let ajax_url = ajax_url  ||  "http://localhost/custom-site/wp-admin/admin-ajax.php";
+let ajax_url = aux_setup_params.ajaxurl  ||  "http://localhost/custom-site/wp-admin/admin-ajax.php";
+console.log(aux_setup_params);
 
 Vue.use(Vuex);
 
@@ -83,6 +84,7 @@ export const PluginPost = {
 				console.log(response.data.data);
 				dispatch('getItems');
 				dispatch('getCPTStatus');
+				dispatch('getElementorTemplatesStatus');
 			})	
 		},
 		getItems:function({state}){
@@ -124,9 +126,29 @@ export const PluginPost = {
 			axios.post(ajax_url, qs.stringify( {
             		action:"serpwars_import_options"
           	} ) ).then(response=>{              		
-				state.pluginSettings = response.data.data;          	
+				state.pluginSettings = response.data.data;         	
      	
 			})	
+		},
+		importTemplates({state,dispatch}){
+			axios.post(ajax_url, qs.stringify( {
+            		action:"serpwars_import_templates"
+          	} ) ).then(response=>{              		
+				var templates = response.data.data;
+				templates.forEach(template=>{
+					dispatch('importTemplate',template)
+				})     	
+			})	
+		},
+		importTemplate({state},template){
+			var url = template.template
+			axios.post(ajax_url, qs.stringify( {
+            		action:"serpwars_import_elementor_templates",
+            		url:url,
+            		name:template.name
+          	} ) ).then(response=>{              		
+				console.log(response)
+			})
 		}
 	}
 }
