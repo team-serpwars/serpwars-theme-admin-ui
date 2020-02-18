@@ -8,35 +8,19 @@
       <button class="btn btn-default btn-lg border border-secondary mb-2 plugins">Plugins</button>
       <button class="btn btn-default btn-lg border border-secondary mb-2 ml-2 mr-2 templates">Templates</button>
       <button class="btn btn-default btn-lg border border-secondary mb-2 options">Options</button>
-<div class="siema">
-  <div> 
-    <plugin-states></plugin-states>
-      <br>
-    <button class="btn btn-success btn-block" @click="install">Install Plugins</button>
-  </div>
-  <div>
-    <elementor-templates></elementor-templates>
-  </div>
-  <div>
-    <advance-custom-field-entries></advance-custom-field-entries>  
-  </div>
-</div>
-        <!-- <b-row class="text-center">
-          <b-col cols="4">
-            <h4>Plugins</h4>
-            <plugin-states></plugin-states>
+      <div class="siema">
+        <div> 
+          <plugin-states></plugin-states>
             <br>
-            <button class="btn btn-success btn-block" @click="install">Install Plugins</button>
-          </b-col>
-          <b-col cols="8">
-            <elementor-templates></elementor-templates>
-          </b-col>
-          <b-col cols="4">
-          </b-col>
-        </b-row>
-        <div class="spacer"> </div>
-        <advance-custom-field-entries></advance-custom-field-entries>   -->        
-        
+          <button class="btn btn-success btn-block" @click="install">Install Plugins</button>
+        </div>
+        <div>
+          <elementor-templates></elementor-templates>
+        </div>
+        <div>
+          <advance-custom-field-entries></advance-custom-field-entries>  
+        </div>
+      </div>            
       </b-container>
   </div>
 </template>
@@ -88,4 +72,5 @@ export default {
 .spacer{
   margin-top:50px;
 }
+
 </style>

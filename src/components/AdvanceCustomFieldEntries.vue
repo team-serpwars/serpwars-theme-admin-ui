@@ -22,9 +22,11 @@
     		</b-list-group-item>
 			</b-list-group>
 		</b-col>
-		  <br>
-		 <button class="btn btn-success btn-block" @click="install">Install Options</button>
+
+		 <button class="btn btn-success btn-block mt-3" @click="install">Install Options</button>
 	</b-row>
+		
+
 </template>
 <script>
 	import { mapState, mapActions } from 'vuex'

@@ -4,9 +4,7 @@ import axios from 'axios';
 import qs  from 'qs';
 import "toastify-js/src/toastify.css"
 import Toastify from 'toastify-js'
-var aux_setup_params = aux_setup_params || {
-	ajaxurl:"http://localhost/custom-site/wp-admin/admin-ajax.php"
-}
+
 let ajax_url = aux_setup_params.ajaxurl  ||  "http://localhost/custom-site/wp-admin/admin-ajax.php";
 // console.log(ajax_url);
 
@@ -77,6 +75,18 @@ export const PluginPost = {
 		},
 		install({state,dispatch}){
 			// console.log(state.pluginSettings.cptui);
+
+			Toastify({
+						text: "Installing Options",
+						duration: 3000,
+						close: false,
+						gravity: "top", // `top` or `bottom`
+						position: 'right', // `left`, `center` or `right`
+						backgroundColor: "linear-gradient(to right, #000099, #0000aa)",
+						stopOnFocus: true // Prevents dismissing of toast on hover
+    				}).showToast();
+
+
 			axios.post(ajax_url, qs.stringify( {
             		action:"serpwars_import_acf_options"
           	} ) ).then(response=>{              		
@@ -90,7 +100,7 @@ export const PluginPost = {
 					Toastify({
 					text: "All Options were installed",
 					duration: 3000,
-					close: true,
+					close: false,
 					gravity: "top", // `top` or `bottom`
 					position: 'right', // `left`, `center` or `right`
 					backgroundColor: "linear-gradient(to right, #009900, #00aa00)",
@@ -114,6 +124,18 @@ export const PluginPost = {
 			if(state.template_imports.currentIndex < state.template_imports.queue.length  && state.pluginSettings.elementor_templates[state.template_imports.currentIndex].found==false){
 				var template = state.template_imports.queue[state.template_imports.currentIndex]
 				// console.log(template);
+
+				Toastify({
+						text: "Installing "+template.name+" Template",
+						duration: 3000,
+						close: false,
+						gravity: "top", // `top` or `bottom`
+						position: 'right', // `left`, `center` or `right`
+						backgroundColor: "linear-gradient(to right, #000099, #0000aa)",
+						stopOnFocus: true // Prevents dismissing of toast on hover
+    				}).showToast();
+
+
 				var url = template.template ;
 				axios.post(ajax_url, qs.stringify( {
             		action:"serpwars_import_elementor_templates",
@@ -124,24 +146,22 @@ export const PluginPost = {
           			state.pluginSettings.elementor_templates[state.template_imports.currentIndex].found=true;
           			state.template_imports.currentIndex +=1;  		
 					Toastify({
-						text: template.name+" Installed",
+						text: template.name+" Template Installed",
 						duration: 3000,
-						close: true,
+						close: false,
 						gravity: "top", // `top` or `bottom`
 						position: 'right', // `left`, `center` or `right`
 						backgroundColor: "linear-gradient(to right, #009900, #00aa00)",
 						stopOnFocus: true // Prevents dismissing of toast on hover
     				}).showToast();
 
-					setTimeout(function(){
 						dispatch('importTemplate');
-					},5000)
 				})
 			}else{
 				Toastify({
 					text: "All templates were Imported",
 					duration: 3000,
-					close: true,
+					close: false,
 					gravity: "top", // `top` or `bottom`
 					position: 'right', // `left`, `center` or `right`
 					backgroundColor: "linear-gradient(to right, #009900, #00aa00)",
