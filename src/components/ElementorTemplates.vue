@@ -9,6 +9,7 @@
     			<b-badge variant="danger" pill v-else="entry.found" >Not Installed</b-badge>
     	</b-list-group-item>
 	</b-list-group>
+    <br>
   <button class="btn btn-success btn-block" @click="importTemplates">Import Templates</button>
 	</div>
 </template>

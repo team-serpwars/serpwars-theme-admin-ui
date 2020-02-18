@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import qs  from 'qs';
-import {WP_Plugin_Service} from './modules/wp-plugins.service.js'
+
 import {PluginPost} from './modules/plugin-post.module.js'
 import "toastify-js/src/toastify.css"
 import Toastify from 'toastify-js'
@@ -70,11 +70,11 @@ export const store = new Vuex.Store({
             		state.pluginPicked.push(state.loadedData.plugins[i])
             	}
             }
-			console.log(state.pluginPicked)
+			// console.log(state.pluginPicked)
 		},
 		setPluginPicked(state,data){
 			state.pluginPicked = data;
-			console.log(state.pluginPicked)
+			// console.log(state.pluginPicked)
 		},
 		setPluginStatus(state,status){
 			const slug = state.installerData._currentItem.slug;
@@ -154,7 +154,7 @@ export const store = new Vuex.Store({
 		},
 		_pluginActions({state},response){
             if (typeof response === "object" && response.success) {
-            	console.log(this);
+            	// console.log(this);
             //     // Update plugin status message
                 
             //     // At this point, if the response contains the url, it means that we need to install/activate it.
@@ -274,6 +274,16 @@ export const store = new Vuex.Store({
             });
             state.pluginPicked.forEach(function(item) {
                 if (item.isDone) {
+                	Toastify({
+					text: item.name+" installed",
+					duration: 3000,
+					close: true,
+					gravity: "top", // `top` or `bottom`
+					position: 'right', // `left`, `center` or `right`
+					backgroundColor: "linear-gradient(to right, #009900, #00aa00)",
+					stopOnFocus: true // Prevents dismissing of toast on hover
+    			}).showToast(); 
+
                 	done_counter+=1
                 }
             });

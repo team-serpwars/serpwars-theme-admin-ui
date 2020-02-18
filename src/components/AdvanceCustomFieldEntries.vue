@@ -22,6 +22,7 @@
     		</b-list-group-item>
 			</b-list-group>
 		</b-col>
+		  <br>
 		 <button class="btn btn-success btn-block" @click="install">Install Options</button>
 	</b-row>
 </template>
