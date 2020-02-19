@@ -5,11 +5,11 @@ import qs  from 'qs';
 import "toastify-js/src/toastify.css"
 import Toastify from 'toastify-js'
 
-if(!aux_setup_params){
-var aux_setup_params = {}	
+if(!serpwars_setup_params){
+var serpwars_setup_params = {}	
 }
 
-let ajax_url = aux_setup_params.ajaxurl  ||  "http://localhost/custom-site/wp-admin/admin-ajax.php";
+let ajax_url = serpwars_setup_params.ajaxurl  ||  "http://localhost/custom-site/wp-admin/admin-ajax.php";
 // console.log(ajax_url);
 
 Vue.use(Vuex);

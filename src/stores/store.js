@@ -10,15 +10,17 @@ import Toastify from 'toastify-js'
 Vue.use(Vuex);
 
 
-if(!aux_setup_params){
-var aux_setup_params = {}	
+if(!serpwars_setup_params){
+	var serpwars_setup_params = {
+		onbefore_text: "Please do not refresh or leave the page during the wizard\'s process."
+	}	
 }
 
-let ajax_url = aux_setup_params.ajaxurl  ||  "http://localhost/custom-site/wp-admin/admin-ajax.php";
+let ajax_url = serpwars_setup_params.ajaxurl  ||  "http://localhost/custom-site/wp-admin/admin-ajax.php";
 
 
 
-console.log(aux_setup_params);
+console.log(serpwars_setup_params);
 var  _ajaxData = {};
 var currentItemHash,_attemptsBuffer,_attemptsBuffer;
 var currentIndex=0;
@@ -38,7 +40,9 @@ export const store = new Vuex.Store({
 			currentIndex:0,
 			_ajaxData:{},
 			_currentItem:undefined,
-			canInstall:true
+			canInstall:true,
+			showMessage:false,
+			message:serpwars_setup_params.onbefore_text
 		},
 		loadedData:{
 			plugins:[],
@@ -113,11 +117,12 @@ export const store = new Vuex.Store({
 			// _installPlugin();
 
 			state.installerData.canInstall = false;
+			state.installerData.showMessage = true;
 			console.log("Installing");
 			console.log(state);
 
 			// Toastify({
-			// 	text: aux_setup_params.onbefore_text,
+			// 	text: serpwars_setup_params.onbefore_text,
 			// 	duration: 30000,
 			// 	close: false,
 			// 	gravity: "top", // `top` or `bottom`
@@ -149,7 +154,7 @@ export const store = new Vuex.Store({
 
 				state.installerData_ajaxData = {
 		            action: "serpwars_setup_plugins",
-		            wpnonce: aux_setup_params.wpnonce,
+		            wpnonce: serpwars_setup_params.wpnonce,
 		            slug: state.installerData._currentItem.slug,
 		            plugins: state.pluginPicked.map(el=>{return el.slug})
 		        };
@@ -315,6 +320,7 @@ export const store = new Vuex.Store({
                 	done_counter+=1
                 }
             });
+            state.installerData.showMessage = false;
 
             if(done_counter == $pluginsList.length){
             	Toastify({

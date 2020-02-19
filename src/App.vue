@@ -4,6 +4,11 @@
       <h1>Welcome to Serpwars Theme</h1>
       <h5>v 1.0.0</h5>
       <div class="spacer"></div>  
+      
+      <div class="alert alert-primary" role="alert" v-if="installerData.showMessage">
+        {{installerData.message}}      
+      </div>
+      <div class="spacer"></div>  
 
       <button class="btn btn-default btn-lg border border-secondary mb-2 plugins">Plugins</button>
       <button class="btn btn-default btn-lg border border-secondary mb-2 ml-2 mr-2 templates">Templates</button>
@@ -43,7 +48,9 @@ export default {
   components: {
       PluginStates,AdvanceCustomFieldEntries,ElementorTemplates
   },
-
+  computed:{
+    ...mapState(['installerData']),
+  },
   methods:{
      ...mapActions(['loadData','install']),
   },
