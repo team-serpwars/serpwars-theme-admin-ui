@@ -11,8 +11,7 @@
       <div class="siema">
         <div> 
           <plugin-states></plugin-states>
-            <br>
-          <button class="btn btn-success btn-block" @click="install">Install Plugins</button>
+          
         </div>
         <div>
           <elementor-templates></elementor-templates>
@@ -44,6 +43,7 @@ export default {
   components: {
       PluginStates,AdvanceCustomFieldEntries,ElementorTemplates
   },
+
   methods:{
      ...mapActions(['loadData','install']),
   },

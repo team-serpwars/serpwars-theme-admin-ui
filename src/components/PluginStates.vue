@@ -1,10 +1,20 @@
 <template>
+    <div>   
 	<b-list-group>
 		<b-list-group-item class="d-flex justify-content-between align-items-center" v-for="plugin  in $store.state.loadedData.plugins">
-				
-    		<label for="">
-    			<input type="checkbox" v-model="pluginPicked" :value="plugin">
-    		{{plugin.name}}</label>
+          
+    		<label for="" :class="{
+                'text-success': (plugin.isActive && plugin.isInstalled),
+                'text-primary': (!plugin.isActive && plugin.isInstalled),
+                'text-danger': (!plugin.isActive && !plugin.isInstalled)
+            }">
+    			<input type="checkbox" v-model="pluginPicked" :value="plugin">    		{{plugin.name}} 
+
+                <div class="spinner-border spinner-border-sm text-dark" role="status" v-if="plugin.status=='Installing'">
+                    <span class="sr-only">Loading...</span>
+                </div>
+
+            </label>
     			<span v-if="plugin.status!=''">
     				<b-badge variant="info" pill >{{plugin.status}}</b-badge>
     			</span>
@@ -16,6 +26,9 @@
     			</span>
     	</b-list-group-item>
 	</b-list-group>
+        <br>
+    <button class="btn btn-success btn-block" @click="install" v-if="installerData.canInstall" >Install Plugins</button>
+    </div>
 </template>
 <script>
 	import { mapState, mapActions } from 'vuex'
@@ -26,7 +39,11 @@
 				picked:[]
 			}
 		},
+        methods:{
+            ...mapActions(['install']),
+        },
 		computed:{
+            ...mapState(['installerData']),
 			pluginPicked: {
       			get () {
         			return this.$store.state.pluginPicked
