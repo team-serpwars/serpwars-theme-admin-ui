@@ -35,6 +35,7 @@ export const store = new Vuex.Store({
 	}, state:{
 		pluginPicked:[],
 		installerData:{
+			progress:0,
 			currentItemHash:"",
 			_attemptsBuffer:0,
 			currentIndex:0,
@@ -262,12 +263,17 @@ export const store = new Vuex.Store({
 
 
      var finish = true
+     var ol = Object.keys(state.loadedData.plugins);
      for(var slug in state.loadedData.plugins){
-     	if(!state.loadedData.plugins[slug].isActive){
-     		finish = false
+     	if(state.loadedData.plugins[slug].isActive){
+     		done_counter += 1;
      	}
+     	// if(state.loadedData.plugins.length){
+     		state.installerData.progress = ((done_counter/ol.length)*100);
+     		console.log(state.installerData.progress +" "+ done_counter+" " +ol.length );
+     	// }
      }
-            if(finish){
+            if(parseInt(state.installerData.progress)== 100){
             	Toastify({
 					text: "All Plugins were successfully installed",
 					duration: 3000,

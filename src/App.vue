@@ -7,6 +7,7 @@
       
       <div class="alert alert-primary" role="alert" v-if="installerData.showMessage">
         {{installerData.message}}      
+        <b-progress :value="installerData.progress" :max="max"  variant="info" show-progress animated></b-progress>
       </div>
       <div class="spacer"></div>  
 
@@ -42,6 +43,8 @@ export default {
   name: 'App',  
   data(){
       return {
+        value:45,
+        max:100,
         mySiema:{}
       }
     },
