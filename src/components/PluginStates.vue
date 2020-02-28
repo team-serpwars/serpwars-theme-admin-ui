@@ -8,15 +8,16 @@
                 'text-primary': (!plugin.isActive && plugin.isInstalled),
                 'text-danger': (!plugin.isActive && !plugin.isInstalled)
             }">
-    			<input type="checkbox" v-model="pluginPicked" :value="plugin">    		{{plugin.name}} 
+    			<input type="checkbox" v-model="pluginPicked" :value="plugin" v-if="!plugin.isActive ">    		{{plugin.name}} 
 
-                <div class="spinner-border spinner-border-sm text-dark" role="status" v-if="plugin.status=='Installing'">
+                <div class="spinner-border spinner-border-sm text-dark" role="status" v-if="plugin.status!=''">
                     <span class="sr-only">Loading...</span>
                 </div>
 
             </label>
     			<span v-if="plugin.status!=''">
-    				<b-badge variant="info" pill >{{plugin.status}}</b-badge>
+    				<b-badge variant="info" pill v-if="plugin.status=='Processing'">{{plugin.status}}</b-badge>
+                    <b-badge variant="secondary" pill v-else-if="plugin.status=='Pending'">{{plugin.status}}</b-badge>
     			</span>
     			<span v-else>
     				
@@ -27,7 +28,7 @@
     	</b-list-group-item>
 	</b-list-group>
         <br>
-    <button class="btn btn-success btn-block" @click="install" v-if="installerData.canInstall" >Install Plugins</button>
+    <button class="btn btn-success btn-block" @click="_processPlugins" v-if="installerData.canInstall" >Install Plugins</button>
     </div>
 </template>
 <script>
@@ -40,7 +41,7 @@
 			}
 		},
         methods:{
-            ...mapActions(['install']),
+            ...mapActions(['_processPlugins']),
         },
 		computed:{
             ...mapState(['installerData']),
