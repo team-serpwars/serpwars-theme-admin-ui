@@ -97,6 +97,8 @@ export const store = new Vuex.Store({
 			}
 		},
 		activate({state},slug){
+			state.loadedData.plugins[slug].isInstalled = true
+			state.loadedData.plugins[slug].status = ""
 			state.loadedData.plugins[slug].isActive = true
 		},
 		loadData:function(state){
@@ -125,30 +127,22 @@ export const store = new Vuex.Store({
 			dispatch("_installPlugins");
 		},
 		_installPlugins({state,dispatch}){
-			// state.installerData._currentItem = state.pluginPicked[state.installerData.currentIndex];	
-
 			var selectedPlugins = [];
 			for(var slug in state.loadedData.plugins){
 				if(!state.loadedData.plugins[slug].isActive){
 					selectedPlugins.push(slug)
 				}
-			}
-		
+			}		
 			if (state.installerData._currentItem) {
 				state.installerData_ajaxData = {
 		            action: "serpwars_setup_plugins",
 		            wpnonce: serpwars_setup_params.wpnonce,
 		            slug: state.installerData._currentItem.slug,
 		            plugins: selectedPlugins
-		        };
-
-		        // console.log(state.installerData_ajaxData)
-
+		        };	        
 		        dispatch('setPluginStatus',"Downloading");
 				dispatch("_globalAJAX", function(response) {
-					if(response.data.status==500){
-						// console.log("Failed");
-						// console.log(state.installerData_ajaxData);
+					if(response.data.status==500){				
 						dispatch('setPluginStatus',"Failed");
 					}else{						
 						dispatch('_pluginActions',response.data)
@@ -156,8 +150,7 @@ export const store = new Vuex.Store({
 				});
 			}
 		},
-		_globalAJAX({state},callback){
-			// console.log("Getting "+state.installerData._currentItem.slug)
+		_globalAJAX({state},callback){			
 			axios.post(_ajaxUrl, qs.stringify(state.installerData_ajaxData)).then(response=>{
     			return response
 			}).then(callback)
@@ -173,32 +166,24 @@ export const store = new Vuex.Store({
             		dispatch("activate",state.installerData._currentItem.slug);
             		state.installerData._currentItem = null;
             		dispatch('_processPlugins');
-            	}
-
-
-           
+            	}           
                 else if (typeof response.data.url !== "undefined") {
-
-                    if (state.installerData.currentItemHash == response.data.hash) {
-                    	   
-    						dispatch('setPluginStatus',"Failed");
-    				        state.installerData.currentItemHash = null;
-    				      	dispatch("_installPlugins");
+                    if (state.installerData.currentItemHash == response.data.hash) {                    	   
+    					dispatch('setPluginStatus',"Failed");
+    				    state.installerData.currentItemHash = null;
+    				    dispatch("_installPlugins");
                     } else {
-      //       //             // we have an ajax url action to perform.
+                        // we have an ajax url action to perform.
                         _ajaxUrl = response.data.url;
                         state.installerData_ajaxData = response.data;
                         state.installerData.currentItemHash = response.data.hash;
-
-
-
                         if(response.data.url  && state.installerData._currentItem){
                         	console.log(response.data.url );
-    						dispatch('setPluginStatus',"Activating");
+
                         	axios.post(response.data.url,
                         	 qs.stringify(state.installerData_ajaxData))
                         	.then(response=>{
-                        		// console.log(response)
+                        		
     							return response
 							}).then(function(html){
 								_ajaxUrl = ajax_url;
@@ -217,69 +202,25 @@ export const store = new Vuex.Store({
                     // otherwise it's just installed and we should make a notify to user
                     // update isChecked
                     state.installerData._currentItem.isInstalled = true
-
                     for(var slug in state.loadedData.plugins){
                     	if(slug==state.installerData._currentItem.slug){
-                    		// console.log(slug+ " is Downloaded")
                     		state.loadedData.plugins[slug].isChecked = false;
                     		state.loadedData.plugins[slug].isDone = true;
-                    		// state.loadedData.plugins[slug].isActive = true;
                     		state.loadedData.plugins[slug].status = "";
-
-
-
-            				dispatch('_processPlugins');
-
-
-                    		// dispatch('setPluginStatus',"done");
+            				dispatch('_processPlugins');                    		
                     	}
                     }
-
-
-        //              state.pluginPicked.forEach(function(e){ 
-        //              if(e.slug==state.installerData._currentItem.slug){
-
-        //              		state.installerData._currentItem.isChecked = false
-                     		
-        //              		state.pluginPicked[state.installerData.currentIndex].isChecked = false
-        //              		state.installerData._currentItem.isDone = true
-        //              		state.installerData._currentItem.isActive = true
-        //              		state.installerData._currentItem.status = "";
-
-        // //              		Toastify({
-								// // text: "installed "+e.slug,
-								// // duration: 3000,
-								// // close: false,
-								// // gravity: "top", // `top` or `bottom`
-								// // position: 'right', // `left`, `center` or `right`
-								// // backgroundColor: "linear-gradient(to right, #000099, #0000aa)",
-								// // stopOnFocus: true // Prevents dismissing of toast on hover
-    				// // 		}).showToast();
-    				// 		dispatch('setPluginStatus',"done");
-
-        //              		state.installerData.currentIndex+=1
-
-        //              	}
-        //              });
-
-                     
-
-                    // Then jump to next plugin
-
                 }
             } else {
-
-
-      //           // If there is an error, we will try to reinstall plugin twice with buffer checkup.
-
+                // If there is an error, we will try to reinstall plugin twice with buffer checkup.
                 if (state.installerData._attemptsBuffer > 1) {
-      //               // Reset buffer value
+                    // Reset buffer value
                     state.installerData._attemptsBuffer = 0;
-      //               // error & try again with next plugin   
+                    // error & try again with next plugin   
     				dispatch('setPluginStatus',"Failed");
     				dispatch('_processPlugins');
                 } else {
-      //               // Try again & update buffer value
+                    // Try again & update buffer value
                     state.installerData.currentItemHash = null;
                     state.installerData._attemptsBuffer += 1;
     				dispatch('_installPlugins');
@@ -288,16 +229,13 @@ export const store = new Vuex.Store({
             }
 		},
 		unselectItem({state},index){
-			state.loadedData.plugins[index].isChecked = false;
-			// console.log(state.loadedData.plugins[index]);
+			state.loadedData.plugins[index].isChecked = false;			
 		},
-
 		_processPlugins({state,dispatch}){
 			var doNext = false;
             var done_counter = 0;
-                // var $pluginsList =  state.loadedData.plugins.map(function(e){ if(e.ischecked) return  e;});
-
-
+            state.installerData.canInstall = false;
+			state.installerData.showMessage = true;
 
                 for(var slug in state.loadedData.plugins){
                 	var item = state.loadedData.plugins[slug];
@@ -308,11 +246,11 @@ export const store = new Vuex.Store({
                 			state.installerData.currentIndex = slug
                 			state.installerData._currentItem = state.loadedData.plugins[slug]
                 			console.log(state.installerData._currentItem);
-                			dispatch('setPluginStatus',"Installing");
+
                 			dispatch('_installPlugins');
                 			doNext = false;
                 		}else if(item.slug == slug){
-                			// dispatch('setPluginStatus',"done");
+                			
                 			
                 			dispatch('unselectItem',slug);
                 			doNext = true;
@@ -323,53 +261,6 @@ export const store = new Vuex.Store({
                 }
 
 
-
-
-     //        state.loadedData.plugins.forEach(function(item,index) {
-
-
-     //            if (state.installerData_currentItem == null || doNext) {
-
-
-     //                if (item.isChecked || !item.isActive) {
-
-     //                	state.installerData.currentIndex = index
-     //                	state.pluginPicked[index].status = "Installing"
-     //                	state.installerData._currentItem = state.pluginPicked[state.installerData.currentIndex];
-
-
-
-
-
-     //                	dispatch('_installPlugins');
-     //                    doNext = false;
-     //                }
-     //            } else if (item.slug === state.installerData._currentItem.slug) {
-     //                state.pluginPicked[index].status = ""
-     //                doNext = true;
-
-
-     //            }
-     //        });
-     //        state.pluginPicked.forEach(function(item,index) {
-     //            if (item.isDone) {
-     // //            	Toastify({
-					// // text: item.name+" installed",
-					// // duration: 3000,
-					// // close: true,
-					// // gravity: "top", // `top` or `bottom`
-					// // position: 'right', // `left`, `center` or `right`
-					// // backgroundColor: "linear-gradient(to right, #009900, #00aa00)",
-					// // stopOnFocus: true // Prevents dismissing of toast on hover
-    	// // 		}).showToast(); 
-    	// 			dispatch('setPluginStatus',"done");
-    	// 			dispatch('unselectItem',index);
-
-     //            	done_counter+=1
-     //            }
-     //        });
-     //        state.installerData.showMessage = false;
-     //        console.log(state.pluginPicked)
      var finish = true
      for(var slug in state.loadedData.plugins){
      	if(!state.loadedData.plugins[slug].isActive){
@@ -377,16 +268,16 @@ export const store = new Vuex.Store({
      	}
      }
             if(finish){
-     //        	Toastify({
-					// text: "All Items were installed",
-					// duration: 3000,
-					// close: true,
-					// gravity: "top", // `top` or `bottom`
-					// position: 'right', // `left`, `center` or `right`
-					// backgroundColor: "linear-gradient(to right, #009900, #00aa00)",
-					// stopOnFocus: true // Prevents dismissing of toast on hover
-    	// 		}).showToast(); 
-    			location.reload();
+            	Toastify({
+					text: "All Plugins were successfully installed",
+					duration: 3000,
+					close: true,
+					gravity: "top", // `top` or `bottom`
+					position: 'right', // `left`, `center` or `right`
+					backgroundColor: "linear-gradient(to right, #009900, #00aa00)",
+					stopOnFocus: true // Prevents dismissing of toast on hover
+    			}).showToast(); 
+    			state.installerData.showMessage = false;
             }    
 		}
 

@@ -16,8 +16,7 @@
 
             </label>
     			<span v-if="plugin.status!=''">
-    				<b-badge variant="info" pill v-if="plugin.status=='Processing'">{{plugin.status}}</b-badge>
-                    <b-badge variant="secondary" pill v-else-if="plugin.status=='Pending'">{{plugin.status}}</b-badge>
+    				<b-badge variant="info">{{plugin.status}}</b-badge>
     			</span>
     			<span v-else>
     				
