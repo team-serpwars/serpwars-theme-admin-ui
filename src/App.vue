@@ -25,6 +25,9 @@
         <div>
           <advance-custom-field-entries></advance-custom-field-entries>  
         </div>
+        <div>
+          <button class="btn btn-danger btn-lg border border-secondary mb-2 options" @click="uninstall">Uninstall features</button>
+        </div>
       </div>            
       </b-container>
   </div>
@@ -55,7 +58,7 @@ export default {
     ...mapState(['installerData']),
   },
   methods:{
-     ...mapActions(['loadData','install']),
+     ...mapActions(['loadData','install','uninstall']),
   },
   async created(){
     await this.loadData();

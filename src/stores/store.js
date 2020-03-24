@@ -110,6 +110,14 @@ export const store = new Vuex.Store({
               state.commit('setData',response.data.data)
           })
 		},
+		uninstall:function(state){
+			axios.post(ajax_url, qs.stringify( {
+            action:"serpwars_uninstall_features"
+
+          } ) ).then(response=>{
+              state.commit('setData',response.data.data)
+          })
+		},
 		loadThemeAssets:function(state){
 		axios.post(ajax_url, qs.stringify( {
             action:"serpwars_get_theme_assets"
