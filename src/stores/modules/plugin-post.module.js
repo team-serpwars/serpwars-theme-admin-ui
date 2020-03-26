@@ -11,7 +11,6 @@ import Toastify from 'toastify-js'
 
 // let ajax_url = serpwars_setup_params.ajaxurl  ||  "http://localhost/custom-site/wp-admin/admin-ajax.php";
 // console.log(ajax_url);
-console.log(serpwars_setup_params.ajaxurl);
 let ajax_url = serpwars_setup_params.ajaxurl  ;
 
 Vue.use(Vuex);
@@ -98,9 +97,11 @@ export const PluginPost = {
           	} ) ).then(response=>{              		
 				state.pluginSettings.acf = response.data.data.acf;         	
 				state.pluginSettings.cptui = response.data.data.cptui;   				
-				dispatch('getCPTStatus');      	
+				dispatch('getCPTStatus');  
 
-				if(!response.data.data.acf[0].id){
+				console.log(response.data.acf);
+
+				if(!response.data.acf[0].id){
 					dispatch('install');
 				}else{
 					Toastify({
@@ -112,6 +113,7 @@ export const PluginPost = {
 					backgroundColor: "linear-gradient(to right, #009900, #00aa00)",
 					stopOnFocus: true // Prevents dismissing of toast on hover
     			}).showToast(); 
+					
 				}
      			// dispatch('getElementorTemplatesStatus');
 			})	
