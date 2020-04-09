@@ -10,12 +10,12 @@ import Toastify from 'toastify-js'
 Vue.use(Vuex);
 
 
-// if(!serpwars_setup_params){
-// 	var serpwars_setup_params = {
-// 		onbefore_text: "Please do not refresh or leave the page during the wizard\'s process.",
-// 		ajaxurl:"http://localhost/custom-site/wp-admin/admin-ajax.php"
-// 	}	
-// }
+if(!serpwars_setup_params){
+	var serpwars_setup_params = {
+		onbefore_text: "Please do not refresh or leave the page during the wizard\'s process.",
+		ajaxurl:"http://localhost/custom-site/wp-admin/admin-ajax.php"
+	}	
+}
 
 
 let ajax_url = serpwars_setup_params.ajaxurl  ;
