@@ -226,6 +226,22 @@ export const PluginPost = {
     			}).showToast();
 
     			state.isInstalling = false;
+
+    			axios.post(ajax_url, qs.stringify( {
+            		action:"serpwars_create_frontpage"
+          		} ) ).then(response=>{ 
+    					Toastify({
+						text: "New Homepage Created",
+						duration: 0,
+						close: true,
+						gravity: "top", // `top` or `bottom`
+						position: 'right', // `left`, `center` or `right`
+						backgroundColor: "linear-gradient(to right, #009900, #00aa00)",
+						stopOnFocus: true // Prevents dismissing of toast on hover
+    					}).showToast();
+          		})
+
+
 			}
 
 			
